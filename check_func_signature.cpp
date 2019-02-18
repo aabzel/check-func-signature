@@ -1,9 +1,10 @@
-// find_func_signature.cpp : Defines the entry point for the console application.
+// check_func_signature.cpp : Defines the entry point for the console application.
 // Extracting C / C++ function prototypes
 // https://stackoverflow.com/questions/1570917/extracting-c-c-function-prototypes
 
 #include "stdafx.h"
-#include "find_func_signature.h"
+#include "pch.h"
+#include "check_func_signature.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -15,6 +16,8 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+
+#include <streambuf>
 
 
 vector<string>  functionsPrototypesListInC;
@@ -319,20 +322,31 @@ bool check_word(string filename, string search)
 
 void check_header(string inputFileNameH ) {
 	int errorCnt = 0;
+
+	ifstream t(inputFileNameH);
+	string strHfileContent;
+
+	t.seekg(0, ios::end);
+	strHfileContent.reserve(t.tellg());
+	t.seekg(0, ios::beg);
+
+	strHfileContent.assign((istreambuf_iterator<char>(t)),
+		istreambuf_iterator<char>());
+
 	cout <<"\n\n check prototypes in header... " << endl;
 	for(int i=0; i<functionsPrototypesListInC.size(); i++) {
 		//cout << functionsPrototypesListInC[i] << endl;
-		bool res = check_word(inputFileNameH, functionsPrototypesListInC[i]);
-		if( !res ) {
+		if (strHfileContent.find(functionsPrototypesListInC[i]) != string::npos) {
+		} else {
 			errorCnt++;
-			cout <<"file "<<inputFileNameH <<" does not contain prototype:\n" <<functionsPrototypesListInC[i]<< endl;
+    		cout << "file " << inputFileNameH << " does not contain prototype:\n" << functionsPrototypesListInC[i] << endl;
 		}
 	}
-	cout <<"verivication done!" << endl;
+	cout << "verivication done!" << endl;
 	cout << "Amount of errors: " << errorCnt  << endl;
 }
 
-int main(int argc, char *argv[]) {
+int main (int argc, char *argv[]) {
 	string inputFileNameC;
 	string inputFileNameH;
 	if (argc < 2) {
