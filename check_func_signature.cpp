@@ -190,7 +190,9 @@ void parse_c_file(string inputFileNameC)
 				codeSnippet = separate_func_prototype(codeSnippet);
 				if (3<codeSnippet.length()) {
 					//cout << "\n{" << codeSnippet << "}";
-					functionsPrototypesListInC.push_back(codeSnippet);
+					if (codeSnippet.find("static") == string::npos) {
+						functionsPrototypesListInC.push_back(codeSnippet);
+					}
 					codeSnippet.clear();
 				}
 			}
@@ -235,5 +237,4 @@ int main(int argc, char *argv[]) {
 	//getchar();
 	return 0;
 }
-
 
