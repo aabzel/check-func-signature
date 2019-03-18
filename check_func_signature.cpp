@@ -3,6 +3,7 @@
 // https://stackoverflow.com/questions/1570917/extracting-c-c-function-prototypes
 
 #include "pch.h"
+
 #include "stdafx.h"
 #include "check_func_signature.h"
 #include <stdio.h>
@@ -10,12 +11,16 @@
 #include <ctype.h>
 #include <string.h>
 
+
 #include <fstream>  //Для файловых потоков
 #include <iostream>
 #include <fstream>
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <regex>
+
+#include <iterator>
 
 vector<string>  functionsPrototypesListInC;
 
@@ -151,6 +156,35 @@ string separate_func_prototype(string codeSnippetIn)
 	return codeSnippetOut;
 }
 
+void findAndReplaceAll(string & data, string toSearch, string replaceStr)
+{
+    // Get the first occurrence
+    size_t pos = data.find(toSearch);
+    // Repeat till end is reached
+    while( pos != std::string::npos) {
+	    // Replace this occurrence of Sub String
+	    data.replace(pos, toSearch.size(), replaceStr);
+	    // Get the next occurrence from the current position
+	    pos =data.find(toSearch, pos + toSearch.size());
+    }
+}
+
+string discard_comments(string inputFileNameC)
+{
+	string result;
+	string strT = inputFileNameC;
+	string inputFileNameCLackComments = inputFileNameC;
+	regex  pattern("(\/{2}([^\r\n]*))");
+	smatch matches;
+    while(regex_search(strT, matches, pattern)) {
+		    if(matches.size()) {
+				findAndReplaceAll(inputFileNameCLackComments, matches.str(0), "");
+		    }
+			strT = matches.suffix().str();
+	}
+    return inputFileNameCLackComments;
+}
+
 void parse_c_file(string inputFileNameC)
 {
 	ifstream cFileIn(inputFileNameC);
@@ -171,6 +205,7 @@ void parse_c_file(string inputFileNameC)
 	strCfileContent.assign((istreambuf_iterator<char>(cFileIn)),
 		istreambuf_iterator<char>());
 
+	strCfileContent = discard_comments(strCfileContent);
 	//cout << "size of " << inputFileNameC << " file: " << strCfileContent.size() << endl;
 
 	int bracketCount = 0;
