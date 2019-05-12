@@ -205,7 +205,7 @@ void parse_c_file(string inputFileNameC)
 	strCfileContent.assign((istreambuf_iterator<char>(cFileIn)),
 		istreambuf_iterator<char>());
 
-	strCfileContent = discard_comments(strCfileContent);
+	strCfileContent = discard_comments (strCfileContent);
 	//cout << "size of " << inputFileNameC << " file: " << strCfileContent.size() << endl;
 
 	int bracketCount = 0;
@@ -251,25 +251,31 @@ int main(int argc, char *argv[]) {
 	string inputFileNameC;
 	string inputFileNameH;
 	if (argc < 3) {
-		cout << "Usage: check_func_signature <input code file name> " << endl;
-		// no input file provided 
+		cout << "Usage: check_func_signature.exe file.c file.h" << endl;
+
 		return 1;
 	}
-	//cout << "argv[0] " << argv[0] << endl;
-	//cout << "argv[1] " << argv[1] << endl;
-	//cout << "argv[2] " << argv[2] << endl;
-
+#if DEBUG_MAIN_ARGS
+	cout << "argc: " << argc << endl;
+	cout << "argv[0]: " << argv[0] << endl;
+	cout << "argv[1]: " << argv[1] << endl;
+	cout << "argv[2]: " << argv[2] << endl;
+#endif
 	inputFileNameC = argv[1];
 	//cout << "input File Name C: " << inputFileNameC << endl;
 	inputFileNameH = argv[2];
-
-	//inputFileNameH.replace(inputFileNameH.find(".c"), sizeof(".h") - 1, ".h");
-	//cout << "input File Name H: " << inputFileNameH << endl;
+	//cout << "input File Name h: " << inputFileNameH << endl;
 
 	parse_c_file(inputFileNameC);
-	//print_list_of_functions_proto();
+#if DEBUG_RESULTS
+	print_list_of_functions_proto();
+#endif 
 	check_header(inputFileNameH);
-	//getchar();
+
+#if DEBUG_WAIT_KEY
+	getchar();
+#endif
+
 	return 0;
 }
 
