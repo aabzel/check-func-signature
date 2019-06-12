@@ -1,0 +1,13 @@
+// preprocSettings.h
+
+#ifndef PREPROC_SETTINGS_H
+#define PREPROC_SETTINGS_H
+
+#define DEBUG_RESULTS 0
+#define DEBUG_WAIT_KEY 1
+#define DEPLOY_UT_DEBUG 0
+#define DEBUG_MAIN_ARGS 0
+#define DEBUG_CLEAN_FUN_PROTO_LEFT 0
+#define DEBUG_CLEAN_FUN_PROTO_LEFT_OUT 0
+
+#endif /* PREPROC_SETTINGS_H */
