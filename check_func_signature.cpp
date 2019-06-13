@@ -4,7 +4,7 @@
 */
 
 
-#include "stdafx.h"
+#include "pch.h"
 #include "unit_test.h"
 #include "preprocSettings.h"
 #include "check_func_signature.h"
@@ -26,6 +26,26 @@
 
 vector<string>  functionsPrototypesListInC;
 
+
+string extract_file_name (string inputFileNameH) {
+	int len = inputFileNameH.length();
+	string outStr = "";
+#if DEBUG_EXTRACT_FILE_NAME
+	cout << "inputFileNameH: " << inputFileNameH << endl;
+#endif
+	char backSlash = '\\';
+	for (int i = (len - 1); 0 <= i; i--) {
+		if (backSlash != inputFileNameH[i] )
+		{
+			outStr = inputFileNameH[i] + outStr;
+		} else {
+
+			break;
+		}
+	}
+
+	return outStr;
+}
 
 string remove_preproc ( string codeSnippetOut) {
 	//return codeSnippetOut;
@@ -105,6 +125,10 @@ int check_header(string inputFileNameH) {
 	//cout << "inputFileNameH "<<inputFileNameH << endl;
 	string strHfileContent;
 	strHfileContent = load_file_to_string (inputFileNameH);
+	if (strHfileContent.length() < 10 ) {
+		cout << " inputFileNameH empty" << inputFileNameH << endl;
+		return 2;
+	}
 	strHfileContent = discard_one_line_comments (strHfileContent);
 	if(strHfileContent.length() < 1 ){
 		return 3;
@@ -128,9 +152,11 @@ int check_header(string inputFileNameH) {
 		}
 	}
 	if(!errorCnt){
-		cout <<"file\: " << inputFileNameH <<" prototypes fine!";
+#if DEBUG_FINE_RESULT
+		cout <<"file\: " << inputFileNameH <<" prototypes fine!\n";
+#endif
 	} else {
-		cout << "\nAmount of errors: " << errorCnt;
+		cout << "\nAmount of errors: " << errorCnt << endl;
 	}
 	return 0;
 }
@@ -263,6 +289,7 @@ void findAndReplaceAll(string & data, string toSearch, string replaceStr)
 
 string load_file_to_string (string inputFileName) {
     ifstream cFileIn(inputFileName);
+	string strCfileContent = "";
 	if (cFileIn.is_open()) {
 		//cout << "file is open" << endl;
 	}
@@ -270,8 +297,6 @@ string load_file_to_string (string inputFileName) {
 		cout << "\nCan not open file " << inputFileName << endl;
 		return "";
 	}
-
-	string strCfileContent="";
 
 	cFileIn.seekg(0, ios::end);
 	strCfileContent.reserve(cFileIn.tellg());
@@ -281,13 +306,16 @@ string load_file_to_string (string inputFileName) {
 		                    istreambuf_iterator<char>());
 	cFileIn.close();
 
-	return strCfileContent;
+	return strCfileContent;   
 }
 
 int check_incule_file (string inputFileNameC, string inputFileNameH ){
    string cFile; 
    cFile = load_file_to_string (inputFileNameC);
-
+   if (cFile.length()==0) {
+	   return 2;
+   }
+   inputFileNameH = extract_file_name(inputFileNameH);
    if (cFile.find(inputFileNameH) != string::npos) {
    } else {
 	   cout << "Error: File " << inputFileNameC << " does not contain include for header " << inputFileNameH << endl;
@@ -302,6 +330,10 @@ void parse_c_file(string inputFileNameC)
 {
 	string strCfileContent; 
 	strCfileContent = load_file_to_string (inputFileNameC);
+	if (strCfileContent.length() == 0) {
+		return;
+	}
+	
 
 	strCfileContent = discard_one_line_comments (strCfileContent);
 	//cout << "size of " << inputFileNameC << " file: " << strCfileContent.size() << endl;
@@ -359,6 +391,7 @@ int main(int argc, char *argv[]) {
 	ret = run_unit_tests();
 	if(ret){
 		cout << "\n Unit test error: [" << ret << "]\n";
+		return 1;
 	}
 	string inputFileNameC;
 	string inputFileNameH;

@@ -11,6 +11,7 @@
 
 using namespace std;
 
+string extract_file_name(string inputFileNameH);
 int check_incule_file (string inputFileNameC, string inputFileNameH );
 int is_proto(string codeSnippetIn);
 int check_header(string inputFileNameH);
